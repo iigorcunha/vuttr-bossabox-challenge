@@ -2,9 +2,13 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
+  ManyToMany,
+  JoinTable,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+import Tag from './Tag';
 
 @Entity('tools')
 class Tool {
@@ -19,6 +23,10 @@ class Tool {
 
   @Column()
   description: string;
+
+  @ManyToMany(() => Tag)
+  @JoinTable({ name: 'tool_tags' })
+  tags: Tag[];
 
   @CreateDateColumn()
   created_at: Date;
