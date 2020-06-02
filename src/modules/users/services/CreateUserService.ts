@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 
 import User from '../infra/typeorm/entities/User';
 
+import IHashProvider from '../providers/HashProvider/models/IHashProvider';
 import IUsersRepository from '../repositories/IUsersRepository';
 
 interface IRequest {
@@ -14,7 +15,10 @@ interface IRequest {
 class CreateUserService {
   constructor(
     @inject('UsersRepository')
-    private usersRepository: IUsersRepository
+    private usersRepository: IUsersRepository,
+
+    @inject('HashProvider')
+    private hashProvider: IHashProvider
   ) {}
 
   public async execute({ name, email, password }: IRequest): Promise<User> {
@@ -24,10 +28,12 @@ class CreateUserService {
       throw new Error('Email address is already used');
     }
 
+    const hashedPass = await this.hashProvider.generateHash(password);
+
     const user = this.usersRepository.create({
       name,
       email,
-      password,
+      password: hashedPass,
     });
 
     return user;
