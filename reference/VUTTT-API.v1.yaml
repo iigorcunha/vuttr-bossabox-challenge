@@ -1,0 +1,158 @@
+openapi: 3.0.0
+info:
+  title: VUTTR - API
+  version: '1.0'
+  description: 'This is a VUTTR ( Very Useful Tools to Remember) Application, where you can save all tools, frameworks and languages that everybody needs to use in a development process.'
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /users:
+    parameters: []
+    post:
+      summary: ''
+      operationId: post-users
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  email:
+                    type: string
+                  created_at:
+                    type: string
+                    description: 'format: date-time'
+                  updated_at:
+                    type: string
+                    description: 'format: date-time'
+                required:
+                  - id
+                  - name
+                  - email
+              examples:
+                Response User:
+                  value:
+                    id: f41bc8c0-2890-45ad-bcbe-15e4a60f5c7d
+                    name: John Doe
+                    email: johndoe@example.com
+                    created_at: '2020-06-06T20:32:08.387Z'
+                    updated_at: '2020-06-06T20:32:08.387Z'
+      description: 'This endpoint does not have any authentication security, anybody can register itself on the application.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Create-User'
+            examples:
+              Request User:
+                value:
+                  name: John Doe
+                  email: johndoe@example.com
+                  password: '123123'
+  '/tools/:id/all':
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  title:
+                    type: string
+                  link:
+                    type: string
+                  description:
+                    type: string
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                  created_at:
+                    type: string
+                    description: 'format: date-time'
+                  updated_at:
+                    type: string
+                    description: 'format: date-time'
+                required:
+                  - id
+                  - title
+                  - link
+                  - description
+                  - tags
+              examples:
+                List All Tools Response:
+                  value:
+                    id: 73ee837c-04d5-4190-a6d8-4cde3cf1d824
+                    title: vuejs
+                    link: 'https://vuejs.com'
+                    description: web crossplatform
+                    tags:
+                      - vuejs
+                      - javascript
+                    created_at: '2020-06-06T20:12:38.650Z'
+                    updated_at: '2020-06-06T20:12:38.650Z'
+      operationId: get-tools-all
+      description: With this endpoint the owner of tools can list all registers created by himself.
+      security:
+        - Json Web Token: []
+    parameters: []
+  '/tools/:id':
+    post:
+      summary: ''
+      operationId: 'post-tools-:id'
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+            examples:
+              User: {}
+        description: With this endpoint you can create new tools for the user passing user id in query.params
+components:
+  schemas:
+    Create-User:
+      title: Create-User
+      type: object
+      x-examples:
+        User Example:
+          name: John Doe
+          email: johndoe@example.com
+          password: '123123'
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - name
+        - email
+        - password
+      description: creation user model
+    Response-User:
+      title: Response-User
+      type: object
+      properties:
+        id:
+          type: string
+  securitySchemes:
+    Json Web Token:
+      type: http
+      scheme: bearer
+      description: This API returns a bearer token to authenticate.

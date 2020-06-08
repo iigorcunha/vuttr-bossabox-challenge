@@ -2,13 +2,13 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToMany,
-  JoinTable,
+  ManyToOne,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
-import Tag from './Tag';
+import User from '@modules/users/infra/typeorm/entities/User';
 
 @Entity('tools')
 class Tool {
@@ -24,9 +24,16 @@ class Tool {
   @Column()
   description: string;
 
-  @ManyToMany(() => Tag)
-  @JoinTable({ name: 'tool_tags' })
-  tags: Tag[];
+  @Column('text', { array: true })
+  tags: string[];
+
+  @Column()
+  user_id: string;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  @ManyToOne(type => User)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 
   @CreateDateColumn()
   created_at: Date;

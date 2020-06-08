@@ -21,7 +21,12 @@ export default class CreateTools1591107647137 implements MigrationInterface {
           {
             name: 'link',
             type: 'varchar',
-            isUnique: true,
+            isNullable: true,
+          },
+          {
+            name: 'tags',
+            type: 'varchar',
+            isArray: true,
             isNullable: true,
           },
           {
