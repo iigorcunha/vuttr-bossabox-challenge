@@ -3,13 +3,19 @@ info:
   title: VUTTR - API
   version: '1.0'
   description: 'This is a VUTTR ( Very Useful Tools to Remember) Application, where you can save all tools, frameworks and languages that everybody needs to use in a development process.'
+  contact:
+    name: Igor Cunha
+    url: github.com/iigorcunha
+    email: igorcesarcunha@gmail.com
+  license:
+    name: MIT
 servers:
   - url: 'http://localhost:3000'
 paths:
   /users:
     parameters: []
     post:
-      summary: ''
+      summary: Create User
       operationId: post-users
       responses:
         '201':
@@ -25,22 +31,21 @@ paths:
                     type: string
                   email:
                     type: string
+                  username:
+                    type: string
                   created_at:
                     type: string
-                    description: 'format: date-time'
+                    format: date-time
                   updated_at:
                     type: string
-                    description: 'format: date-time'
-                required:
-                  - id
-                  - name
-                  - email
+                    format: date-time
               examples:
                 Response User:
                   value:
                     id: f41bc8c0-2890-45ad-bcbe-15e4a60f5c7d
                     name: John Doe
                     email: johndoe@example.com
+                    username: johndoe
                     created_at: '2020-06-06T20:32:08.387Z'
                     updated_at: '2020-06-06T20:32:08.387Z'
       description: 'This endpoint does not have any authentication security, anybody can register itself on the application.'
@@ -48,16 +53,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Create-User'
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                username:
+                  type: string
+                password:
+                  type: string
             examples:
               Request User:
                 value:
                   name: John Doe
                   email: johndoe@example.com
-                  password: '123123'
-  '/tools/:id/all':
+                  username: johndoe
+                  password: '123456'
+  /tools/all:
     get:
-      summary: Your GET endpoint
+      summary: List All Tools
       tags: []
       responses:
         '200':
@@ -85,6 +100,8 @@ paths:
                   updated_at:
                     type: string
                     description: 'format: date-time'
+                  user_id:
+                    type: string
                 required:
                   - id
                   - title
@@ -94,65 +111,244 @@ paths:
               examples:
                 List All Tools Response:
                   value:
-                    id: 73ee837c-04d5-4190-a6d8-4cde3cf1d824
-                    title: vuejs
-                    link: 'https://vuejs.com'
-                    description: web crossplatform
+                    id: 87cb01a0-e562-4633-b14a-3d1b92a76518
+                    title: nodeJS
+                    link: 'https://nodejs.org'
+                    description: an asynchronous event-driven JavaScript runtime
                     tags:
-                      - vuejs
                       - javascript
-                    created_at: '2020-06-06T20:12:38.650Z'
-                    updated_at: '2020-06-06T20:12:38.650Z'
+                      - backend
+                      - node
+                    user_id: ff22c213-e9e2-412b-81e4-832611976474
+                    created_at: '2020-06-12T20:43:21.738Z'
+                    updated_at: '2020-06-12T20:43:21.738Z'
       operationId: get-tools-all
-      description: With this endpoint the owner of tools can list all registers created by himself.
+      description: This endpoint returns all user tools. We catch the `user_id` by user authenticated token.
       security:
         - Json Web Token: []
     parameters: []
-  '/tools/:id':
+  /tools/:
     post:
-      summary: ''
-      operationId: 'post-tools-:id'
+      summary: Create Tools
+      operationId: post-tools
       responses:
-        '200':
-          description: OK
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  title:
+                    type: string
+                  link:
+                    type: string
+                  description:
+                    type: string
+                  tags:
+                    type: array
+                    items: {}
+                  user_id:
+                    type: string
+                  created_at:
+                    type: string
+                    description: 'format: date-time'
+                    format: date-time
+                  updated_at:
+                    type: string
+                    description: 'format: date-time'
+                    format: date-time
+              examples:
+                tool-response:
+                  value:
+                    id: 87cb01a0-e562-4633-b14a-3d1b92a76518
+                    title: nodeJS
+                    link: 'https://nodejs.org'
+                    description: an asynchronous event-driven JavaScript runtime
+                    tags:
+                      - javascript
+                      - backend
+                      - node
+                    user_id: ff22c213-e9e2-412b-81e4-832611976474
+                    created_at: '2020-06-12T20:43:21.738Z'
+                    updated_at: '2020-06-12T20:43:21.738Z'
+          headers: {}
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              type: object
+              properties:
+                title:
+                  type: string
+                link:
+                  type: string
+                description:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - title
             examples:
-              User: {}
+              Tool:
+                value:
+                  title: nodeJS
+                  link: 'https://nodejs.org'
+                  description: an asynchronous event-driven JavaScript runtime
+                  tags:
+                    - javascript
+                    - backend
+                    - node
         description: With this endpoint you can create new tools for the user passing user id in query.params
+      security:
+        - Json Web Token: []
+      description: 'To create a tool, is necessary to be authenticated and this endpoint will ensure that all tools create by a user it will be related with him.'
+    parameters: []
+  /sessions:
+    post:
+      summary: Create Session
+      operationId: post-sessions
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                      username:
+                        type: string
+                      email:
+                        type: string
+                      created_at:
+                        type: string
+                        format: date-time
+                      updated_at:
+                        type: string
+                        format: date-time
+                  token:
+                    type: string
+              examples:
+                authentication-response:
+                  value:
+                    user:
+                      id: ff22c213-e9e2-412b-81e4-832611976474
+                      name: John Doe
+                      username: johndoe
+                      email: johndoe@example.com
+                      created_at: '2020-06-12T20:38:06.634Z'
+                      updated_at: '2020-06-12T20:38:06.634Z'
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFyYWNucyIsImlhdCI6MTU5MTk4MzUyNiwiZXhwIjoxNTkyMDY5OTI2LCJzdWIiOiJmZjIyYzIxMy1lOWUyLTQxMmItODFlNC04MzI2MTE5NzY0NzQifQ.BDR6bkJk0QXTrEleNGggXyOEt1aXbvD6hP3kmMzR_eo
+      description: 'Endpoint to check if user has permissions to authenticate, and returns a JWT with `user_id` and `username` payload.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+            examples:
+              authentication-request:
+                value:
+                  email: John Doe
+                  password: '123456'
+  '/tools/{id}':
+    delete:
+      summary: Delete Tools
+      operationId: 'delete-tools-:id'
+      responses:
+        '204':
+          description: No Content
+      description: 'Delete tools by `id`, use tool id on a delete request passing id on url to delete a tool.'
+      security:
+        - Json Web Token: []
+      parameters: []
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+  '/tools?tag={tag}':
+    get:
+      summary: List Tools By Tag Name
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  title:
+                    type: string
+                  link:
+                    type: string
+                  description:
+                    type: string
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                  user_id:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+              examples:
+                tool-response:
+                  value:
+                    id: 87cb01a0-e562-4633-b14a-3d1b92a76518
+                    title: nodeJS
+                    link: 'https://nodejs.org'
+                    description: an asynchronous event-driven JavaScript runtime
+                    tags:
+                      - javascript
+                      - backend
+                      - node
+                    user_id: ff22c213-e9e2-412b-81e4-832611976474
+                    created_at: '2020-06-12T20:43:21.738Z'
+                    updated_at: '2020-06-12T20:43:21.738Z'
+      operationId: 'get-tools?tag=:tag'
+      description: This endpoint can filter tools by tags
+      security:
+        - Json Web Token: []
+      parameters:
+        - schema:
+            type: string
+          in: query
+          required: true
+          name: tag
+    parameters:
+      - schema:
+          type: string
+        name: tag
+        in: path
+        required: true
 components:
-  schemas:
-    Create-User:
-      title: Create-User
-      type: object
-      x-examples:
-        User Example:
-          name: John Doe
-          email: johndoe@example.com
-          password: '123123'
-      properties:
-        name:
-          type: string
-        email:
-          type: string
-        password:
-          type: string
-      required:
-        - name
-        - email
-        - password
-      description: creation user model
-    Response-User:
-      title: Response-User
-      type: object
-      properties:
-        id:
-          type: string
+  schemas: {}
   securitySchemes:
     Json Web Token:
       type: http
       scheme: bearer
-      description: This API returns a bearer token to authenticate.
+      description: This API returns a bearer token to authenticate. with `user_id` and `username` as a payload.
