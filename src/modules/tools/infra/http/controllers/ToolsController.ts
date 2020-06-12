@@ -25,12 +25,12 @@ class ToolsController {
   }
 
   public async show(request: Request, response: Response): Promise<Response> {
-    const { tag } = request.query;
+    const sTag = request.query.tag as string;
     const user_id = request.user.id;
 
     const findToolsByTags = container.resolve(FindToolsByTagsService);
 
-    const tools = await findToolsByTags.execute({ user_id, tag });
+    const tools = await findToolsByTags.execute({ user_id, tag: sTag });
 
     return response.json(tools);
   }

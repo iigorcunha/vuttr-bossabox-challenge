@@ -5,6 +5,7 @@ import AppError from '@shared/infra/errors/AppError';
 import authConfig from '@config/auth';
 
 interface ITokenPayload {
+  username: string;
   iat: number;
   exp: number;
   sub: string;
@@ -28,10 +29,11 @@ export default function ensureAuthenticated(
   try {
     const decoded = verify(token, secret);
 
-    const { sub } = decoded as ITokenPayload;
+    const { sub, username } = decoded as ITokenPayload;
 
     request.user = {
       id: sub,
+      username,
     };
     return next();
   } catch {

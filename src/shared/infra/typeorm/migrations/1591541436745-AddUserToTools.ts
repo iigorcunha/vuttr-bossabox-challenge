@@ -30,7 +30,7 @@ export default class AddUserToTools1591541436745 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKey('tools', 'UserToolFK');
+    await queryRunner.dropForeignKey('tools', 'UserToolsFK');
     await queryRunner.dropColumn('tools', 'user_id');
   }
 }
